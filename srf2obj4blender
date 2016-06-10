@@ -1,0 +1,146 @@
+#!/bin/bash
+
+# Print usage if no argument is given
+if [ -z "$1" ]; then
+cat <<EOU
+Generate obj files for the brain hemisphere and subcortical structures
+segmented for blender.
+
+Usage:
+srf2obj4blender -s <list of subjects> [-d]
+
+Options:
+-s <list> : Specify a list of subjects between quotes,
+            e.g. -s "john bill mary mark" or a text file
+            containing one subject per line.
+
+-d          Debug mode. Leave all temporary files.
+
+Requirements:
+srf2obj must have been configured in the same folder as this file and the variables
+FREESURFER_HOME and SUBJECTS_DIR must have been correctly set.
+
+_____________________________________
+Liang Li
+NINDS/NIH
+Jun/2016
+liang.li.brain@gmail.com
+EOU
+exit
+fi
+
+# Check and accept arguments
+SBJLIST=""
+DEBUG=N
+while getopts 's:d' OPTION
+do
+  case ${OPTION} in
+    s) SBJLIST=$( [[ -f ${OPTARG} ]] && cat ${OPTARG} || echo "${OPTARG}" ) ;;
+    d) DEBUG=Y ;;
+  esac
+done
+
+# For each subject
+for s in ${SBJLIST} ; do
+
+  # Create directories for temp files and results
+  mkdir -p ${SUBJECTS_DIR}/${s}/blender
+  SRF_PATH=${SUBJECTS_DIR}/${s}/ascii
+  DST_DIR=${SUBJECTS_DIR}/${s}/blender
+
+  echo "copying left hemisphere"
+  ${FREESURFER_HOME}/bin/mris_convert \
+         ${SUBJECTS_DIR}/${s}/surf/lh.pial \
+         ${SUBJECTS_DIR}/${s}/ascii/lh.pial.asc
+  mv ${SUBJECTS_DIR}/${s}/ascii/lh.pial.asc \
+     ${SUBJECTS_DIR}/${s}/ascii/lh.pial.srf
+     
+  echo "copying right hemisphere"
+  ${FREESURFER_HOME}/bin/mris_convert \
+        ${SUBJECTS_DIR}/${s}/surf/rh.pial \
+        ${SUBJECTS_DIR}/${s}/ascii/rh.pial.asc
+  mv ${SUBJECTS_DIR}/${s}/ascii/rh.pial.asc \
+     ${SUBJECTS_DIR}/${s}/ascii/rh.pial.srf
+
+  echo "converting lh.pial.srf to lh.pial.obj"
+  ./srf2obj $SRF_PATH/lh.pial.srf > $DST_DIR/lh.pial.obj
+  echo "converting rh.pial.srf to rh.pial.obj"
+  ./srf2obj $SRF_PATH/rh.pial.srf > $DST_DIR/rh.pial.obj
+
+  echo "converting seg_004.srf to Left_lateral_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_004.srf > $DST_DIR/Left_lateral_ventricle.obj
+  echo "converting seg_005.srf to Left_lateral_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_005.srf > $DST_DIR/Left_inferior_lateral_ventricle.obj
+  echo "converting seg_007.srf to Left_lateral_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_007.srf > $DST_DIR/Left_cerebellum_white_matter.obj
+  echo "converting seg_008.srf to Left_cerebellum_cortex.obj"
+  ./srf2obj $SRF_PATH/aseg_008.srf > $DST_DIR/Left_cerebellum_cortex.obj
+  echo "converting seg_010.srf to Left_thalamus.obj"
+  ./srf2obj $SRF_PATH/aseg_010.srf > $DST_DIR/Left_thalamus.obj
+  echo "converting seg_011.srf to Left_caudate.obj"
+  ./srf2obj $SRF_PATH/aseg_011.srf > $DST_DIR/Left_caudate.obj
+  echo "converting seg_012.srf to Left_putamen.obj"
+  ./srf2obj $SRF_PATH/aseg_012.srf > $DST_DIR/Left_putamen.obj
+  echo "converting seg_013.srf to Left_pallidum.obj"
+  ./srf2obj $SRF_PATH/aseg_013.srf > $DST_DIR/Left_pallidum.obj
+  echo "converting seg_017.srf to Left_hippocampus.obj"
+  ./srf2obj $SRF_PATH/aseg_017.srf > $DST_DIR/Left_hippocampus.obj
+  echo "converting seg_018.srf to Left_amygdala.obj"
+  ./srf2obj $SRF_PATH/aseg_018.srf > $DST_DIR/Left_amygdala.obj
+  echo "converting seg_024.srf to CSF.obj"
+  ./srf2obj $SRF_PATH/aseg_024.srf > $DST_DIR/CSF.obj
+  echo "converting seg_026.srf to Left_accumbens.obj"
+  ./srf2obj $SRF_PATH/aseg_026.srf > $DST_DIR/Left_accumbens.obj
+  echo "converting seg_028.srf to Left_ventral_diencephalon.obj"
+  ./srf2obj $SRF_PATH/aseg_028.srf > $DST_DIR/Left_ventral_diencephalon.obj
+  echo "converting seg_031.srf to Left_choroid_plexus.obj"
+  ./srf2obj $SRF_PATH/aseg_031.srf > $DST_DIR/Left_choroid_plexus.obj
+  echo "converting seg_043.srf to Right_lateral_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_043.srf > $DST_DIR/Right_lateral_ventricle.obj
+  echo "converting seg_044.srf to Right_inferior_lateral_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_044.srf > $DST_DIR/Right_inferior_lateral_ventricle.obj
+  echo "converting seg_046.srf to Right_cerebellum_white_matter.obj"
+  ./srf2obj $SRF_PATH/aseg_046.srf > $DST_DIR/Right_cerebellum_white_matter.obj
+  echo "converting seg_047.srf to Right_cerebellum_cortex.obj"
+  ./srf2obj $SRF_PATH/aseg_047.srf > $DST_DIR/Right_cerebellum_cortex.obj
+  echo "converting seg_049.srf to Right_thalamus.obj"
+  ./srf2obj $SRF_PATH/aseg_049.srf > $DST_DIR/Right_thalamus.obj
+  echo "converting seg_050.srf to Right_caudate.obj"
+  ./srf2obj $SRF_PATH/aseg_050.srf > $DST_DIR/Right_caudate.obj
+  echo "converting seg_051.srf to Right_putamen.obj"
+  ./srf2obj $SRF_PATH/aseg_051.srf > $DST_DIR/Right_putamen.obj
+  echo "converting seg_052.srf to Right_pallidum.obj"
+  ./srf2obj $SRF_PATH/aseg_052.srf > $DST_DIR/Right_pallidum.obj
+  echo "converting seg_053.srf to Right_hippocampus.obj"
+  ./srf2obj $SRF_PATH/aseg_053.srf > $DST_DIR/Right_hippocampus.obj
+  echo "converting seg_054.srf to Right_amygdala.obj"
+  ./srf2obj $SRF_PATH/aseg_054.srf > $DST_DIR/Right_amygdala.obj
+  echo "converting seg_058.srf to Right_accumbens.obj"
+  ./srf2obj $SRF_PATH/aseg_058.srf > $DST_DIR/Right_accumbens.obj
+  echo "converting seg_060.srf to Right_ventral_diencephalon.obj"
+  ./srf2obj $SRF_PATH/aseg_060.srf > $DST_DIR/Right_ventral_diencephalon.obj
+  echo "converting seg_063.srf to Right_choroid_plexus.obj"
+  ./srf2obj $SRF_PATH/aseg_063.srf > $DST_DIR/Right_choroid_plexus.obj
+  echo "converting seg_251.srf to posterior_Corpus_callosum.obj"
+  ./srf2obj $SRF_PATH/aseg_251.srf > $DST_DIR/posterior_Corpus_callosum.obj
+  echo "converting seg_252.srf to middle_posterior_Corpus_callosum.obj"
+  ./srf2obj $SRF_PATH/aseg_252.srf > $DST_DIR/middle_posterior_Corpus_callosum.obj
+  echo "converting seg_253.srf to central_Corpus_callosum.obj"
+  ./srf2obj $SRF_PATH/aseg_253.srf > $DST_DIR/central_Corpus_callosum.obj
+  echo "converting seg_254.srf to middle_anterior_Corpus_callosum.obj"
+  ./srf2obj $SRF_PATH/aseg_254.srf > $DST_DIR/middle_anterior_Corpus_callosum.obj
+  echo "converting seg_255.srf to anterior_Corpus_callosum.obj"
+  ./srf2obj $SRF_PATH/aseg_255.srf > $DST_DIR/anterior_Corpus_callosum.obj
+  echo "converting seg_014.srf to 3rd_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_014.srf > $DST_DIR/3rd_ventricle.obj
+  echo "converting seg_015.srf to 4th_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_015.srf > $DST_DIR/4th_ventricle.obj
+  echo "converting seg_072.srf to 5th_ventricle.obj"
+  ./srf2obj $SRF_PATH/aseg_072.srf > $DST_DIR/5th_ventricle.obj
+  echo "converting seg_016.srf to Brain_stem.obj"
+  ./srf2obj $SRF_PATH/aseg_016.srf > $DST_DIR/Brain_stem.obj
+
+
+  echo "==> Done: ${s}"
+done
+exit 0
